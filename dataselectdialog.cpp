@@ -32,6 +32,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <QSettings>
 #include <QStringList>
 #include <fstream>
+#include <QApplication>
+#include <QSpinBox>
+#include <QLineEdit>
+
+bool DataSelectDialog::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::FocusIn)
+    {
+        qDebug() << "FocusIn";
+        QSpinBox* spinbox = qobject_cast<QSpinBox*>(object);
+        if (spinbox != nullptr)
+        {
+            qDebug() << "Spinbox";
+            spinbox->selectAll();
+        }
+    } else if (event->type() == QEvent::MouseButtonPress) {
+        qDebug() << "MousePress";
+        QLineEdit* edit = qobject_cast<QLineEdit*>(object);
+        if (edit != nullptr) {
+            qDebug() << "LineEdit";
+            QSpinBox* spin = qobject_cast<QSpinBox*>(edit->parent());
+            if (spin != nullptr) {
+                qDebug() << "Spin";
+                spin->selectAll();
+            }
+        }
+
+    }
+    return false;
+}
 
 DataSelectDialog::DataSelectDialog(InputParameters& params, QWidget* parent)
     : QDialog(parent)
@@ -40,6 +70,11 @@ DataSelectDialog::DataSelectDialog(InputParameters& params, QWidget* parent)
     , data_selected(false)
 {
     ui->setupUi(this);
+    ui->homDimSpinBox->installEventFilter(this);
+    ui->xbinSpinBox->installEventFilter(this);
+    ui->xbinSpinBox->findChild<QLineEdit*>()->installEventFilter(this);
+    ui->ybinSpinBox->installEventFilter(this);
+    ui->ybinSpinBox->findChild<QLineEdit*>()->installEventFilter(this);
     //set initial values
     if (!params.fileName.empty()) {
         detect_file_type();

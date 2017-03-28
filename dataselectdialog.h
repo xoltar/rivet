@@ -60,6 +60,7 @@ private:
     void invalid_file(const QString& message);
     void detect_file_type();
 
+    bool eventFilter(QObject *object, QEvent *event);
     bool data_selected; //false until user clicks "compute" button
 };
 
