@@ -12,7 +12,7 @@
 #include <vector>
 #include "dcel/msgpack_adapters.h"
 #include "input_parameters.h"
-
+#include "numerics.h"
 
 extern "C"
 RivetComputation* read_rivet_computation(const char* bytes, size_t length) {
@@ -83,6 +83,31 @@ ArrangementBounds bounds_from_computation(RivetComputation * rivet_computation) 
 }
 
 extern "C"
+StructurePoints* structure_from_computation(RivetComputation * rivet_computation) {
+    ComputationResult* computation = reinterpret_cast<ComputationResult*>(rivet_computation);
+    auto template_points = computation->template_points;
+    auto points = new StructurePoint[template_points.size()];
+    auto x_grades = new Ratio[computation->arrangement->x_exact.size()];
+    for (size_t i = 0; i < computation->arrangement->x_exact.size();i++) {
+        auto grade = computation->arrangement->x_exact[i];
+        x_grades[i] = Ratio{numerator(grade).convert_to<int64_t>(), denominator(grade).convert_to<int64_t>()};
+    }
+    auto y_grades = new Ratio[computation->arrangement->y_exact.size()];
+    for (size_t i = 0; i < computation->arrangement->y_exact.size();i++) {
+        auto grade = computation->arrangement->y_exact[i];
+        y_grades[i] = Ratio{numerator(grade).convert_to<int64_t>(), denominator(grade).convert_to<int64_t>()};
+    }
+    auto grades = new ExactGrades{
+            x_grades,
+            computation->arrangement->x_exact.size(),
+            y_grades,
+            computation->arrangement->y_exact.size()
+    };
+    auto point = new StructurePoints{grades, points, template_points.size()};
+    return point;
+}
+
+extern "C"
 void free_barcodes_result(BarCodesResult *result) {
     for (size_t bc = 0; bc < result->length; bc++) {
         auto bcp = result->barcodes[bc];
@@ -93,3 +118,11 @@ void free_barcodes_result(BarCodesResult *result) {
 }
 
 
+extern "C"
+void free_structure_points(StructurePoints *points) {
+    delete[] points->grades->x_grades;
+    delete[] points->grades->y_grades;
+    delete points->grades;
+    delete[] points->points;
+    delete points;
+}

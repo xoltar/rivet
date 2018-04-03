@@ -49,6 +49,32 @@ typedef struct {
     double y_high;
 } ArrangementBounds;
 
+typedef struct {
+    unsigned x;
+    unsigned y;
+    unsigned betti_0;
+    unsigned betti_1;
+    unsigned betti_2;
+} StructurePoint;
+
+typedef struct {
+    int64_t nom;
+    int64_t denom;
+} Ratio;
+
+typedef struct {
+    Ratio* x_grades;
+    size_t x_length;
+    Ratio* y_grades;
+    size_t y_length;
+} ExactGrades;
+
+typedef struct {
+    ExactGrades* grades;
+    StructurePoint* points;
+    size_t length;
+} StructurePoints;
+
 struct rivet_comp;
 typedef rivet_comp RivetComputation;
 
@@ -63,9 +89,14 @@ BarCodesResult* barcodes_from_computation(RivetComputation* rivet_computation,
 
 ArrangementBounds bounds_from_computation(RivetComputation* rivet_computation);
 
+
+StructurePoints* structure_from_computation(RivetComputation* rivet_computation);
+
 void free_rivet_computation(RivetComputation * rivet_computation);
 
 void free_barcodes_result(BarCodesResult *result);
+
+void free_structure_points(StructurePoints* points);
 
 }
 
