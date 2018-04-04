@@ -87,6 +87,10 @@ StructurePoints* structure_from_computation(RivetComputation * rivet_computation
     ComputationResult* computation = reinterpret_cast<ComputationResult*>(rivet_computation);
     auto template_points = computation->template_points;
     auto points = new StructurePoint[template_points.size()];
+    for (size_t i = 0; i < template_points.size(); i++) {
+        auto point = template_points[i];
+        points[i] = StructurePoint{point.x, point.y, (unsigned)point.zero, (unsigned)point.one, (unsigned)point.two};
+    }
     auto x_grades = new Ratio[computation->arrangement->x_exact.size()];
     for (size_t i = 0; i < computation->arrangement->x_exact.size();i++) {
         auto grade = computation->arrangement->x_exact[i];
@@ -104,6 +108,10 @@ StructurePoints* structure_from_computation(RivetComputation * rivet_computation
             computation->arrangement->y_exact.size()
     };
     auto point = new StructurePoints{grades, points, template_points.size()};
+    //std::clog << "Returning StucturePoints with " << template_points.size()
+              //<< " points and " << computation->arrangement->x_exact.size()
+              //<< " x grades and " << computation->arrangement->y_exact.size()
+                                  //<< "y grades" << std::endl;
     return point;
 }
 
