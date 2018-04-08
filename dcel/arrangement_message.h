@@ -43,8 +43,7 @@ public:
     template <class Archive>
     void serialize(Archive& ar, const unsigned int /*version*/)
     {
-        ar& x_grades& y_grades& x_exact & y_exact & half_edges& vertices
-        & anchors& faces& topleft& topright& bottomleft& bottomright& vertical_line_query_list;
+        ar& x_grades& y_grades& x_exact& y_exact& half_edges& vertices& anchors& faces& topleft& topright& bottomleft& bottomright& vertical_line_query_list;
     }
 
     MSGPACK_DEFINE(x_grades, y_grades, x_exact , y_exact , half_edges, vertices, anchors, faces, topleft, topright, bottomleft, bottomright, vertical_line_query_list);

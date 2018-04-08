@@ -24,7 +24,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "dcel/dcel.h"
 #include "interface/input_manager.h"
 #include "interface/input_parameters.h"
-#include "math/simplex_tree.h"
+#include "math/bifiltration_data.h"
+#include "math/firep.h"
 #include "math/template_point.h"
 #include "numerics.h"
 
@@ -45,9 +46,14 @@ public:
     std::string x_label;
     std::string y_label;
 
-    SimplexTree& bifiltration()
+    BifiltrationData& bifiltration()
     {
-        return *(data.simplex_tree);
+        return *(data.bifiltration_data);
+    }
+    
+    FIRep& rep()
+    {
+        return *(data.free_implicit_rep);
     }
 
     ComputationInput(InputData data)
@@ -64,7 +70,7 @@ struct ComputationResult {
     unsigned_matrix homology_dimensions;
     std::vector<TemplatePoint> template_points;
     std::shared_ptr<Arrangement> arrangement;
-    std::shared_ptr<SimplexTree> bifiltration;
+    //std::shared_ptr<FIRep> bifiltration;
 };
 
 class Computation {
@@ -72,16 +78,15 @@ public:
     //TODO: these signals are a little strange, they should go away soon
     boost::signals2::signal<void(std::shared_ptr<Arrangement>)> arrangement_ready;
     boost::signals2::signal<void(TemplatePointsMessage)> template_points_ready;
-    Computation(InputParameters& params, Progress& progress);
+    Computation(int vrbsty, Progress& progress);
     ~Computation();
 
-    std::unique_ptr<ComputationResult> compute(InputData data);
+    std::unique_ptr<ComputationResult> compute(InputData data, bool koszul);
 
 private:
-    InputParameters& params;
     Progress& progress;
 
     const int verbosity;
 
-    std::unique_ptr<ComputationResult> compute_raw(ComputationInput& input);
+    std::unique_ptr<ComputationResult> compute_raw(ComputationInput& input, bool koszul);
 };
